@@ -11,7 +11,7 @@ function App() {
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState("");
 
-  const backend = "http://44.206.186.70:4000";
+  const backend = "http://localhost:4000";
 
   useEffect(() => {
     fetch(`${backend}/api/projects`)

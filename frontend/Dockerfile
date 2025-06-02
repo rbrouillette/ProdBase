@@ -1,29 +1,21 @@
-# --- Stage 1: Build ---
-FROM node:20 AS builder
+# Stage 1: Build React app
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Enable Corepack and activate pnpm (with exact version)
-RUN corepack enable && corepack prepare pnpm@10.11.0 --activate
-
-# Copy only package manager files first (for caching)
-COPY package.json pnpm-lock.yaml ./
-
-# Install dependencies with no prompts or changes
-RUN pnpm install --frozen-lockfile
-
-# Copy rest of the frontend code and build
+# Copy and build
 COPY . .
+RUN corepack enable
+RUN pnpm install
 RUN pnpm run build
 
-# --- Stage 2: Serve via NGINX ---
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
+# Stage 2: Serve with Nginx
+FROM nginx:stable-alpine as runner
 
-# Copy production build output
-COPY --from=builder /app/dist .
+# Copy built app to Nginx directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Replace default NGINX config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Optional: Remove default config and insert custom config if needed
+# COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
