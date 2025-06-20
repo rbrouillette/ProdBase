@@ -38,3 +38,10 @@ clean:
 
 prune:
 	docker system prune -a --volumes -f
+init:
+	@if [ ! -f .env ]; then \
+		cp .env.template .env && \
+		echo "✅ .env created from .env.template"; \
+	else \
+		echo "⚠️  .env already exists. Skipping."; \
+	fi
