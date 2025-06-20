@@ -45,3 +45,12 @@ init:
 	else \
 		echo "⚠️  .env already exists. Skipping."; \
 	fi
+reset-env:
+	@rm -f .env && cp .env.template .env && echo "🔁 Reset .env from template"
+seed-db:
+	$(COMPOSE) exec backend npm run seed
+psql:
+	$(COMPOSE) exec db psql -U $$POSTGRES_USER -d $$POSTGRES_DB
+restart-db:
+	$(COMPOSE) restart db
+.PHONY: help build up down restart logs shell clean prune init reset-env seed-db psql restart-db
